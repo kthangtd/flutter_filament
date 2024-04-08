@@ -25,8 +25,7 @@ class ResizeObserver extends SingleChildRenderObjectWidget {
         );
 
   @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _RenderResizeObserver(onLayoutChangedCallback: onResized);
+  RenderObject createRenderObject(BuildContext context) => _RenderResizeObserver(onLayoutChangedCallback: onResized);
 }
 
 class _RenderResizeObserver extends RenderProxyBox {
@@ -58,8 +57,7 @@ class FilamentWidget extends StatefulWidget {
   ///
   final Widget? initial;
 
-  const FilamentWidget({Key? key, required this.controller, this.initial})
-      : super(key: key);
+  const FilamentWidget({Key? key, required this.controller, this.initial}) : super(key: key);
 
   @override
   _FilamentWidgetState createState() => _FilamentWidgetState();
@@ -110,11 +108,7 @@ class _SizedFilamentWidget extends StatefulWidget {
   final Widget? initial;
   final FilamentController controller;
 
-  const _SizedFilamentWidget(
-      {required this.width,
-      required this.height,
-      this.initial,
-      required this.controller});
+  const _SizedFilamentWidget({required this.width, required this.height, this.initial, required this.controller});
 
   @override
   State<StatefulWidget> createState() => _SizedFilamentWidgetState();
@@ -167,9 +161,7 @@ class _SizedFilamentWidgetState extends State<_SizedFilamentWidget> {
     // debug mode does need a longer timeout.
     _resizeTimer?.cancel();
 
-    _resizeTimer = Timer(
-        Duration(milliseconds: (kReleaseMode || Platform.isWindows) ? 10 : 100),
-        () async {
+    _resizeTimer = Timer(Duration(milliseconds: (kReleaseMode || Platform.isWindows) ? 10 : 100), () async {
       if (!mounted) {
         completer.complete();
         return;
@@ -256,32 +248,22 @@ class _SizedFilamentWidgetState extends State<_SizedFilamentWidget> {
     // if an error was encountered in creating a viewer, display the error message and don't even try to display a Texture widget.
     if (_error != null) {
       return Container(
-          color: Colors.white,
-          child: Column(children: [
-            const Text("A fatal error was encountered"),
-            Text(_error!)
-          ]));
+          color: Colors.white, child: Column(children: [const Text("A fatal error was encountered"), Text(_error!)]));
     }
 
     if (!widget.controller.requiresTextureWidget) {
-      return Stack(children: [
-        Positioned.fill(child: CustomPaint(painter: TransparencyPainter()))
-      ]);
+      return Stack(children: [Positioned.fill(child: CustomPaint(painter: TransparencyPainter()))]);
     }
 
     return ListenableBuilder(
         listenable: widget.controller.textureDetails,
         builder: (BuildContext ctx, Widget? wdgt) {
           if (widget.controller.textureDetails.value == null) {
-            return Stack(children: [
-              Positioned.fill(
-                  child: widget.initial ?? Container(color: Colors.red))
-            ]);
+            return Stack(children: [Positioned.fill(child: widget.initial ?? Container(color: Colors.red))]);
           }
           // see [FilamentControllerFFI.resize] for an explanation of how we deal with resizing
           var texture = Texture(
-            key: ObjectKey(
-                "texture_${widget.controller.textureDetails.value!.textureId}"),
+            key: ObjectKey("texture_${widget.controller.textureDetails.value!.textureId}"),
             textureId: widget.controller.textureDetails.value!.textureId,
             filterQuality: FilterQuality.none,
             freeze: false,
@@ -290,11 +272,7 @@ class _SizedFilamentWidgetState extends State<_SizedFilamentWidget> {
           return Stack(children: [
             Positioned.fill(
                 child: Platform.isLinux || Platform.isWindows
-                    ? Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.rotationX(
-                            pi), // TODO - this rotation is due to OpenGL texture coordinate working in a different space from Flutter, can we move this to the C++ side somewhere?
-                        child: texture)
+                    ? Transform(alignment: Alignment.center, transform: Matrix4.rotationX(pi), child: texture)
                     : texture)
           ]);
         });

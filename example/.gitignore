@@ -49,3 +49,7 @@ app.*.map.json
 
 # fvm
 .fvm/flutter_sdk
+
+**/**/.cxx
+pubspec.lock
+**/**/Podfile.lock

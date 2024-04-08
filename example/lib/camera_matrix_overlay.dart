@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_filament/filament_controller.dart';
 
 class CameraMatrixOverlay extends StatefulWidget {
@@ -21,15 +20,12 @@ class _CameraMatrixOverlayState extends State<CameraMatrixOverlay> {
   void _updateTimer() {
     _cameraTimer?.cancel();
     if (widget.controller.hasViewer.value) {
-      _cameraTimer =
-          Timer.periodic(const Duration(milliseconds: 50), (timer) async {
+      _cameraTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) async {
         var cameraPosition = await widget.controller.getCameraPosition();
         var cameraRotation = await widget.controller.getCameraRotation();
 
-        _cameraPosition =
-            "${cameraPosition.storage.map((v) => v.toStringAsFixed(2))}";
-        _cameraRotation =
-            "${cameraRotation.storage.map((v) => v.toStringAsFixed(2))}";
+        _cameraPosition = "${cameraPosition.storage.map((v) => v.toStringAsFixed(2))}";
+        _cameraRotation = "${cameraRotation.storage.map((v) => v.toStringAsFixed(2))}";
 
         setState(() {});
       });
@@ -55,9 +51,7 @@ class _CameraMatrixOverlayState extends State<CameraMatrixOverlay> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(29)),
+        decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), borderRadius: BorderRadius.circular(29)),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Text("Camera position : $_cameraPosition $_cameraRotation",
             style: const TextStyle(color: Colors.white, fontSize: 12)));

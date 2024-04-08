@@ -10,11 +10,10 @@ import 'package:flutter_filament_example/menus/scene_menu.dart';
 
 import 'package:flutter_filament/filament_controller.dart';
 
-const loadDefaultScene = bool.hasEnvironment('--load-default-scene');
+const loadDefaultScene = true; //bool.hasEnvironment('--load-default-scene');
 
 void main() async {
-  print(loadDefaultScene);
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -90,8 +89,7 @@ class ExampleWidgetState extends State<ExampleWidget> {
         await Future.delayed(const Duration(milliseconds: 100));
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
           await _filamentController!.createViewer();
-          await _filamentController!
-              .loadSkybox("assets/default_env/default_env_skybox.ktx");
+          await _filamentController!.loadSkybox("assets/default_env/default_env_skybox.ktx");
           await _filamentController!.setRendering(true);
           await _filamentController!.loadGlb("assets/shapes/shapes.glb");
         });
@@ -127,15 +125,11 @@ class ExampleWidgetState extends State<ExampleWidget> {
                     onControllerCreated: (controller) {
                       setState(() {
                         _filamentController = controller;
-                        _listener = _filamentController!.onLoad
-                            .listen((FilamentEntity entity) {
-                          print("Set last to $entity");
+                        _listener = _filamentController!.onLoad.listen((FilamentEntity entity) {
                           last = entity;
                           if (mounted) {
                             setState(() {});
                           }
-                          print(_filamentController!.getNameForEntity(entity) ??
-                              "NAME NOT FOUND");
                         });
                       });
                     }),
@@ -147,9 +141,7 @@ class ExampleWidgetState extends State<ExampleWidget> {
                   child: const Text("Toggle viewport size"),
                   onPressed: () {
                     setState(() {
-                      _viewportMargin = (_viewportMargin == EdgeInsets.zero)
-                          ? const EdgeInsets.all(30)
-                          : EdgeInsets.zero;
+                      _viewportMargin = (_viewportMargin == EdgeInsets.zero) ? const EdgeInsets.all(30) : EdgeInsets.zero;
                     });
                   },
                 )

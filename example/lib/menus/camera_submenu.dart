@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_filament/filament_controller.dart';
 import 'package:flutter_filament_example/main.dart';
 
@@ -27,8 +25,7 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
         onPressed: ExampleWidgetState.last == null
             ? null
             : () async {
-                await widget.controller
-                    .setCamera(ExampleWidgetState.last!, null);
+                await widget.controller.setCamera(ExampleWidgetState.last!, null);
               },
         child: const Text('Set to first camera in last added asset'),
       ),
@@ -36,8 +33,7 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
         onPressed: ExampleWidgetState.last == null
             ? null
             : () async {
-                await widget.controller
-                    .moveCameraToAsset(ExampleWidgetState.last!);
+                await widget.controller.moveCameraToAsset(ExampleWidgetState.last!);
               },
         child: const Text("Move to last added asset"),
       ),
@@ -49,19 +45,15 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
       ),
       MenuItemButton(
         onPressed: () {
-          ExampleWidgetState.frustumCulling =
-              !ExampleWidgetState.frustumCulling;
-          widget.controller
-              .setViewFrustumCulling(ExampleWidgetState.frustumCulling);
+          ExampleWidgetState.frustumCulling = !ExampleWidgetState.frustumCulling;
+          widget.controller.setViewFrustumCulling(ExampleWidgetState.frustumCulling);
         },
-        child: Text(
-            "${ExampleWidgetState.frustumCulling ? "Disable" : "Enable"} frustum culling"),
+        child: Text("${ExampleWidgetState.frustumCulling ? "Disable" : "Enable"} frustum culling"),
       ),
       MenuItemButton(
           closeOnActivate: false,
           onPressed: () async {
-            var projMatrix =
-                await widget.controller.getCameraProjectionMatrix();
+            var projMatrix = await widget.controller.getCameraProjectionMatrix();
             await showDialog(
                 context: context,
                 builder: (ctx) {
@@ -70,9 +62,7 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
                           height: 100,
                           width: 300,
                           color: Colors.white,
-                          child: Text(projMatrix.storage
-                              .map((v) => v.toStringAsFixed(2))
-                              .join(","))));
+                          child: Text(projMatrix.storage.map((v) => v.toStringAsFixed(2)).join(","))));
                 });
           },
           child: const Text("Get projection matrix")),
@@ -83,12 +73,7 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
             await showDialog(
                 context: context,
                 builder: (ctx) {
-                  return Center(
-                      child: Container(
-                          height: 300,
-                          width: 300,
-                          color: Colors.white,
-                          child: Text(frustum.toString())));
+                  return Center(child: Container(height: 300, width: 300, color: Colors.white, child: Text(frustum.toString())));
                 });
           },
           child: const Text("Get frustum")),
@@ -105,10 +90,8 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
               },
               child: Text(
                 mm.name,
-                style: TextStyle(
-                    fontWeight: ExampleWidgetState.cameraManipulatorMode == mm
-                        ? FontWeight.bold
-                        : FontWeight.normal),
+                style:
+                    TextStyle(fontWeight: ExampleWidgetState.cameraManipulatorMode == mm ? FontWeight.bold : FontWeight.normal),
               ),
             );
           }).toList(),
@@ -127,10 +110,7 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
               child: Text(
                 speed.toString(),
                 style: TextStyle(
-                    fontWeight:
-                        (speed - ExampleWidgetState.zoomSpeed).abs() < 0.0001
-                            ? FontWeight.bold
-                            : FontWeight.normal),
+                    fontWeight: (speed - ExampleWidgetState.zoomSpeed).abs() < 0.0001 ? FontWeight.bold : FontWeight.normal),
               ),
             );
           }).toList(),
@@ -150,10 +130,7 @@ class _CameraSubmenuState extends State<CameraSubmenu> {
               child: Text(
                 speed.toString(),
                 style: TextStyle(
-                    fontWeight:
-                        (speed - ExampleWidgetState.orbitSpeedX).abs() < 0.0001
-                            ? FontWeight.bold
-                            : FontWeight.normal),
+                    fontWeight: (speed - ExampleWidgetState.orbitSpeedX).abs() < 0.0001 ? FontWeight.bold : FontWeight.normal),
               ),
             );
           }).toList(),

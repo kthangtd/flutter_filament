@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_filament/filament_controller.dart';
 import 'package:flutter_filament_example/main.dart';
 
@@ -28,17 +27,14 @@ class _RenderingSubmenuState extends State<RenderingSubmenu> {
             ExampleWidgetState.rendering = !ExampleWidgetState.rendering;
             widget.controller.setRendering(ExampleWidgetState.rendering);
           },
-          child: Text(
-              "Set continuous rendering to ${!ExampleWidgetState.rendering}"),
+          child: Text("Set continuous rendering to ${!ExampleWidgetState.rendering}"),
         ),
         MenuItemButton(
           onPressed: () {
-            ExampleWidgetState.framerate =
-                ExampleWidgetState.framerate == 60 ? 30 : 60;
+            ExampleWidgetState.framerate = ExampleWidgetState.framerate == 60 ? 30 : 60;
             widget.controller.setFrameRate(ExampleWidgetState.framerate);
           },
-          child: Text(
-              "Toggle framerate (currently $ExampleWidgetState.framerate) "),
+          child: Text("Toggle framerate (currently $ExampleWidgetState.framerate) "),
         ),
         MenuItemButton(
           onPressed: () {
@@ -48,13 +44,10 @@ class _RenderingSubmenuState extends State<RenderingSubmenu> {
         ),
         MenuItemButton(
           onPressed: () {
-            ExampleWidgetState.postProcessing =
-                !ExampleWidgetState.postProcessing;
-            widget.controller
-                .setPostProcessing(ExampleWidgetState.postProcessing);
+            ExampleWidgetState.postProcessing = !ExampleWidgetState.postProcessing;
+            widget.controller.setPostProcessing(ExampleWidgetState.postProcessing);
           },
-          child: Text(
-              "${ExampleWidgetState.postProcessing ? "Disable" : "Enable"} postprocessing"),
+          child: Text("${ExampleWidgetState.postProcessing ? "Disable" : "Enable"} postprocessing"),
         ),
       ],
       child: const Text("Rendering"),

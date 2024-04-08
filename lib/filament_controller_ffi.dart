@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
@@ -60,9 +62,12 @@ class FilamentControllerFFI extends FilamentController {
   final _entities = <FilamentEntity>{};
 
   final _onLoadController = StreamController<FilamentEntity>.broadcast();
+
+  @override
   Stream<FilamentEntity> get onLoad => _onLoadController.stream;
 
   final _onUnloadController = StreamController<FilamentEntity>.broadcast();
+  @override
   Stream<FilamentEntity> get onUnload => _onUnloadController.stream;
 
   ///
@@ -75,24 +80,21 @@ class FilamentControllerFFI extends FilamentController {
     // (this is because there is no apparent way to exactly synchronize resizing a Flutter widget and resizing a pixel buffer, so we need
     // to handle the latter first and rebuild the swapchain appropriately).
     _channel.setMethodCallHandler((call) async {
-      if (call.arguments[0] == _resizingWidth &&
-          call.arguments[1] == _resizingHeight) {
+      if (call.arguments[0] == _resizingWidth && call.arguments[1] == _resizingHeight) {
         return;
       }
       _resizeTimer?.cancel();
       _resizingWidth = call.arguments[0];
       _resizingHeight = call.arguments[1];
       _resizeTimer = Timer(const Duration(milliseconds: 500), () async {
-        rect.value = Offset.zero &
-            ui.Size(_resizingWidth!.toDouble(), _resizingHeight!.toDouble());
+        rect.value = Offset.zero & ui.Size(_resizingWidth!.toDouble(), _resizingHeight!.toDouble());
         await resize();
       });
     });
-    late DynamicLibrary dl;
     if (Platform.isIOS || Platform.isMacOS || Platform.isWindows) {
-      dl = DynamicLibrary.process();
+      DynamicLibrary.process();
     } else {
-      dl = DynamicLibrary.open("libflutter_filament_android.so");
+      DynamicLibrary.open("libflutter_filament_android.so");
     }
 
     if (Platform.isWindows) {
@@ -130,8 +132,7 @@ class FilamentControllerFFI extends FilamentController {
 
   @override
   Future setDimensions(Rect rect, double pixelRatio) async {
-    this.rect.value = Rect.fromLTWH(rect.left, rect.top,
-        rect.width * _pixelRatio, rect.height * _pixelRatio);
+    this.rect.value = Rect.fromLTWH(rect.left, rect.top, rect.width * _pixelRatio, rect.height * _pixelRatio);
     _pixelRatio = pixelRatio;
   }
 
@@ -158,8 +159,7 @@ class FilamentControllerFFI extends FilamentController {
   @override
   Future destroyTexture() async {
     if (textureDetails.value != null) {
-      await _channel.invokeMethod(
-          "destroyTexture", textureDetails.value!.textureId);
+      await _channel.invokeMethod("destroyTexture", textureDetails.value!.textureId);
     }
     dev.log("Texture destroyed");
   }
@@ -174,43 +174,31 @@ class FilamentControllerFFI extends FilamentController {
           "Dimensions have not yet been set by FilamentWidget. You need to wait for at least one frame after FilamentWidget has been inserted into the hierarchy");
     }
     if (_viewer != null) {
-      throw Exception(
-          "Viewer already exists, make sure you call destroyViewer first");
+      throw Exception("Viewer already exists, make sure you call destroyViewer first");
     }
     if (textureDetails.value != null) {
-      throw Exception(
-          "Texture already exists, make sure you call destroyTexture first");
+      throw Exception("Texture already exists, make sure you call destroyTexture first");
     }
 
-    var loader = Pointer<ResourceLoaderWrapper>.fromAddress(
-        await _channel.invokeMethod("getResourceLoaderWrapper"));
+    var loader = Pointer<ResourceLoaderWrapper>.fromAddress(await _channel.invokeMethod("getResourceLoaderWrapper"));
     if (loader == nullptr) {
       throw Exception("Failed to get resource loader");
     }
 
     if (Platform.isWindows && requiresTextureWidget) {
-      _driver = Pointer<Void>.fromAddress(
-          await _channel.invokeMethod("getDriverPlatform"));
+      _driver = Pointer<Void>.fromAddress(await _channel.invokeMethod("getDriverPlatform"));
     }
 
     var renderCallbackResult = await _channel.invokeMethod("getRenderCallback");
-    var renderCallback =
-        Pointer<NativeFunction<Void Function(Pointer<Void>)>>.fromAddress(
-            renderCallbackResult[0]);
-    var renderCallbackOwner =
-        Pointer<Void>.fromAddress(renderCallbackResult[1]);
+    var renderCallback = Pointer<NativeFunction<Void Function(Pointer<Void>)>>.fromAddress(renderCallbackResult[0]);
+    var renderCallbackOwner = Pointer<Void>.fromAddress(renderCallbackResult[1]);
 
     var renderingSurface = await _createRenderingSurface();
 
     dev.log("Got rendering surface");
 
-    _viewer = create_filament_viewer_ffi(
-        Pointer<Void>.fromAddress(renderingSurface.sharedContext),
-        _driver,
-        uberArchivePath?.toNativeUtf8().cast<Char>() ?? nullptr,
-        loader,
-        renderCallback,
-        renderCallbackOwner);
+    _viewer = create_filament_viewer_ffi(Pointer<Void>.fromAddress(renderingSurface.sharedContext), _driver,
+        uberArchivePath?.toNativeUtf8().cast<Char>() ?? nullptr, loader, renderCallback, renderCallbackOwner);
     dev.log("Created viewer");
     if (_viewer!.address == 0) {
       throw Exception("Failed to create viewer. Check logs for details");
@@ -218,33 +206,23 @@ class FilamentControllerFFI extends FilamentController {
 
     _assetManager = get_asset_manager(_viewer!);
 
-    create_swap_chain_ffi(_viewer!, renderingSurface.surface,
-        rect.value!.width.toInt(), rect.value!.height.toInt());
+    create_swap_chain_ffi(_viewer!, renderingSurface.surface, rect.value!.width.toInt(), rect.value!.height.toInt());
     dev.log("Created swap chain");
     if (renderingSurface.textureHandle != 0) {
-      dev.log(
-          "Creating render target from native texture  ${renderingSurface.textureHandle}");
-      create_render_target_ffi(_viewer!, renderingSurface.textureHandle,
-          rect.value!.width.toInt(), rect.value!.height.toInt());
+      dev.log("Creating render target from native texture  ${renderingSurface.textureHandle}");
+      create_render_target_ffi(_viewer!, renderingSurface.textureHandle, rect.value!.width.toInt(), rect.value!.height.toInt());
     }
 
     textureDetails.value = TextureDetails(
-        textureId: renderingSurface.flutterTextureId,
-        width: rect.value!.width.toInt(),
-        height: rect.value!.height.toInt());
+        textureId: renderingSurface.flutterTextureId, width: rect.value!.width.toInt(), height: rect.value!.height.toInt());
     dev.log("texture details ${textureDetails.value}");
-    update_viewport_and_camera_projection_ffi(
-        _viewer!, rect.value!.width.toInt(), rect.value!.height.toInt(), 1.0);
+    update_viewport_and_camera_projection_ffi(_viewer!, rect.value!.width.toInt(), rect.value!.height.toInt(), 1.0);
     hasViewer.value = true;
   }
 
   Future<RenderingSurface> _createRenderingSurface() async {
-    return RenderingSurface.from(await _channel.invokeMethod("createTexture", [
-      rect.value!.width,
-      rect.value!.height,
-      rect.value!.left,
-      rect.value!.top
-    ]));
+    return RenderingSurface.from(
+        await _channel.invokeMethod("createTexture", [rect.value!.width, rect.value!.height, rect.value!.left, rect.value!.top]));
   }
 
   ///
@@ -332,17 +310,11 @@ class FilamentControllerFFI extends FilamentController {
 
     if (requiresTextureWidget) {
       if (textureDetails.value != null) {
-        await _channel.invokeMethod(
-            "destroyTexture", textureDetails.value!.textureId);
+        await _channel.invokeMethod("destroyTexture", textureDetails.value!.textureId);
       }
     } else if (Platform.isWindows) {
       dev.log("Resizing window with rect $rect");
-      await _channel.invokeMethod("resizeWindow", [
-        rect.value!.width,
-        rect.value!.height,
-        rect.value!.left,
-        rect.value!.top
-      ]);
+      await _channel.invokeMethod("resizeWindow", [rect.value!.width, rect.value!.height, rect.value!.left, rect.value!.top]);
     }
 
     var renderingSurface = await _createRenderingSurface();
@@ -354,24 +326,18 @@ class FilamentControllerFFI extends FilamentController {
     _assetManager = get_asset_manager(_viewer!);
 
     if (!_usesBackingWindow) {
-      create_swap_chain_ffi(_viewer!, renderingSurface.surface,
-          rect.value!.width.toInt(), rect.value!.height.toInt());
+      create_swap_chain_ffi(_viewer!, renderingSurface.surface, rect.value!.width.toInt(), rect.value!.height.toInt());
     }
 
     if (renderingSurface.textureHandle != 0) {
-      dev.log(
-          "Creating render target from native texture  ${renderingSurface.textureHandle}");
-      create_render_target_ffi(_viewer!, renderingSurface.textureHandle,
-          rect.value!.width.toInt(), rect.value!.height.toInt());
+      dev.log("Creating render target from native texture  ${renderingSurface.textureHandle}");
+      create_render_target_ffi(_viewer!, renderingSurface.textureHandle, rect.value!.width.toInt(), rect.value!.height.toInt());
     }
 
     textureDetails.value = TextureDetails(
-        textureId: renderingSurface.flutterTextureId,
-        width: rect.value!.width.toInt(),
-        height: rect.value!.height.toInt());
+        textureId: renderingSurface.flutterTextureId, width: rect.value!.width.toInt(), height: rect.value!.height.toInt());
 
-    update_viewport_and_camera_projection_ffi(
-        _viewer!, rect.value!.width.toInt(), rect.value!.height.toInt(), 1.0);
+    update_viewport_and_camera_projection_ffi(_viewer!, rect.value!.width.toInt(), rect.value!.height.toInt(), 1.0);
 
     await setRendering(_rendering);
 
@@ -391,8 +357,7 @@ class FilamentControllerFFI extends FilamentController {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    set_background_image_ffi(
-        _viewer!, path.toNativeUtf8().cast<Char>(), fillHeight);
+    set_background_image_ffi(_viewer!, path.toNativeUtf8().cast<Char>(), fillHeight);
   }
 
   @override
@@ -400,17 +365,12 @@ class FilamentControllerFFI extends FilamentController {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    set_background_color_ffi(
-        _viewer!,
-        color.red.toDouble() / 255.0,
-        color.green.toDouble() / 255.0,
-        color.blue.toDouble() / 255.0,
-        color.alpha.toDouble() / 255.0);
+    set_background_color_ffi(_viewer!, color.red.toDouble() / 255.0, color.green.toDouble() / 255.0,
+        color.blue.toDouble() / 255.0, color.alpha.toDouble() / 255.0);
   }
 
   @override
-  Future setBackgroundImagePosition(double x, double y,
-      {bool clamp = false}) async {
+  Future setBackgroundImagePosition(double x, double y, {bool clamp = false}) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -450,35 +410,25 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future<FilamentEntity> addLight(
-      int type,
-      double colour,
-      double intensity,
-      double posX,
-      double posY,
-      double posZ,
-      double dirX,
-      double dirY,
-      double dirZ,
-      bool castShadows) async {
+  Future<FilamentEntity> addLight(int type, double colour, double intensity, double posX, double posY, double posZ, double dirX,
+      double dirY, double dirZ, bool castShadows) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    var entity = add_light_ffi(_viewer!, type, colour, intensity, posX, posY,
-        posZ, dirX, dirY, dirZ, castShadows);
+    var entity = add_light_ffi(_viewer!, type, colour, intensity, posX, posY, posZ, dirX, dirY, dirZ, castShadows);
     _onLoadController.sink.add(entity);
     _lights.add(entity);
     return entity;
   }
 
   @override
-  Future removeLight(FilamentEntity entity) async {
+  Future removeLight(FilamentEntity light) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    _lights.remove(entity);
-    remove_light_ffi(_viewer!, entity);
-    _onUnloadController.add(entity);
+    _lights.remove(light);
+    remove_light_ffi(_viewer!, light);
+    _onUnloadController.add(light);
   }
 
   @override
@@ -501,8 +451,7 @@ class FilamentControllerFFI extends FilamentController {
     if (unlit) {
       throw Exception("Not yet implemented");
     }
-    var entity =
-        load_glb_ffi(_assetManager!, path.toNativeUtf8().cast<Char>(), unlit);
+    var entity = load_glb_ffi(_assetManager!, path.toNativeUtf8().cast<Char>(), unlit);
     if (entity == _FILAMENT_ASSET_ERROR) {
       throw Exception("An error occurred loading the asset at $path");
     }
@@ -512,8 +461,7 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future<FilamentEntity> loadGltf(String path, String relativeResourcePath,
-      {bool force = false}) async {
+  Future<FilamentEntity> loadGltf(String path, String relativeResourcePath, {bool force = false}) async {
     if (Platform.isWindows && !force) {
       throw Exception(
           "loadGltf has a race condition on Windows which is likely to crash your program. If you really want to try, pass force=true to loadGltf");
@@ -521,8 +469,8 @@ class FilamentControllerFFI extends FilamentController {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    var entity = load_gltf_ffi(_assetManager!, path.toNativeUtf8().cast<Char>(),
-        relativeResourcePath.toNativeUtf8().cast<Char>());
+    var entity =
+        load_gltf_ffi(_assetManager!, path.toNativeUtf8().cast<Char>(), relativeResourcePath.toNativeUtf8().cast<Char>());
     if (entity == _FILAMENT_ASSET_ERROR) {
       throw Exception("An error occurred loading the asset at $path");
     }
@@ -580,8 +528,7 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future setMorphTargetWeights(
-      FilamentEntity entity, String meshName, List<double> weights) async {
+  Future setMorphTargetWeights(FilamentEntity entity, String meshName, List<double> weights) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -590,24 +537,20 @@ class FilamentControllerFFI extends FilamentController {
     for (int i = 0; i < weights.length; i++) {
       weightsPtr.elementAt(i).value = weights[i];
     }
-    set_morph_target_weights_ffi(_assetManager!, entity,
-        meshName.toNativeUtf8().cast<Char>(), weightsPtr, weights.length);
+    set_morph_target_weights_ffi(_assetManager!, entity, meshName.toNativeUtf8().cast<Char>(), weightsPtr, weights.length);
     calloc.free(weightsPtr);
   }
 
   @override
-  Future<List<String>> getMorphTargetNames(
-      FilamentEntity entity, String meshName) async {
+  Future<List<String>> getMorphTargetNames(FilamentEntity entity, String meshName) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
     var names = <String>[];
-    var count = get_morph_target_name_count_ffi(
-        _assetManager!, entity, meshName.toNativeUtf8().cast<Char>());
+    var count = get_morph_target_name_count_ffi(_assetManager!, entity, meshName.toNativeUtf8().cast<Char>());
     var outPtr = calloc<Char>(255);
     for (int i = 0; i < count; i++) {
-      get_morph_target_name(_assetManager!, entity,
-          meshName.toNativeUtf8().cast<Char>(), outPtr, i);
+      get_morph_target_name(_assetManager!, entity, meshName.toNativeUtf8().cast<Char>(), outPtr, i);
       names.add(outPtr.cast<Utf8>().toDartString());
     }
     calloc.free(outPtr);
@@ -631,20 +574,17 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future<double> getAnimationDuration(
-      FilamentEntity entity, int animationIndex) async {
+  Future<double> getAnimationDuration(FilamentEntity entity, int animationIndex) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    var duration =
-        get_animation_duration(_assetManager!, entity, animationIndex);
+    var duration = get_animation_duration(_assetManager!, entity, animationIndex);
 
     return duration;
   }
 
   @override
-  Future setMorphAnimationData(
-      FilamentEntity entity, MorphAnimationData animation) async {
+  Future setMorphAnimationData(FilamentEntity entity, MorphAnimationData animation) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -657,8 +597,7 @@ class FilamentControllerFFI extends FilamentController {
     // the morph targets in [animation] might be a subset of those that actually exist in the mesh (and might not have the same order)
     // we don't want to reorder the data (?? or do we? this is probably more efficient for the backend?)
     // so let's get the actual list of morph targets from the mesh and pass the relevant indices to the native side.
-    var meshMorphTargets =
-        await getMorphTargetNames(entity, animation.meshName);
+    var meshMorphTargets = await getMorphTargetNames(entity, animation.meshName);
 
     Pointer<Int> idxPtr = calloc<Int>(animation.morphTargets.length);
     for (int i = 0; i < animation.numMorphTargets; i++) {
@@ -672,22 +611,14 @@ class FilamentControllerFFI extends FilamentController {
       idxPtr.elementAt(i).value = index;
     }
 
-    set_morph_animation(
-        _assetManager!,
-        entity,
-        animation.meshName.toNativeUtf8().cast<Char>(),
-        dataPtr,
-        idxPtr,
-        animation.numMorphTargets,
-        animation.numFrames,
-        (animation.frameLengthInMs));
+    set_morph_animation(_assetManager!, entity, animation.meshName.toNativeUtf8().cast<Char>(), dataPtr, idxPtr,
+        animation.numMorphTargets, animation.numFrames, (animation.frameLengthInMs));
     calloc.free(dataPtr);
     calloc.free(idxPtr);
   }
 
   @override
-  Future setBoneAnimation(
-      FilamentEntity entity, BoneAnimationData animation) async {
+  Future setBoneAnimation(FilamentEntity entity, BoneAnimationData animation) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -772,20 +703,15 @@ class FilamentControllerFFI extends FilamentController {
 
   @override
   Future playAnimation(FilamentEntity entity, int index,
-      {bool loop = false,
-      bool reverse = false,
-      bool replaceActive = true,
-      double crossfade = 0.0}) async {
+      {bool loop = false, bool reverse = false, bool replaceActive = true, double crossfade = 0.0}) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    play_animation_ffi(
-        _assetManager!, entity, index, loop, reverse, replaceActive, crossfade);
+    play_animation_ffi(_assetManager!, entity, index, loop, reverse, replaceActive, crossfade);
   }
 
   @override
-  Future setAnimationFrame(
-      FilamentEntity entity, int index, int animationFrame) async {
+  Future setAnimationFrame(FilamentEntity entity, int index, int animationFrame) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -805,8 +731,7 @@ class FilamentControllerFFI extends FilamentController {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    var result = set_camera(
-        _viewer!, entity, name?.toNativeUtf8().cast<Char>() ?? nullptr);
+    var result = set_camera(_viewer!, entity, name?.toNativeUtf8().cast<Char>() ?? nullptr);
     if (!result) {
       throw Exception("Failed to set camera");
     }
@@ -879,8 +804,7 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future setCameraExposure(
-      double aperture, double shutterSpeed, double sensitivity) async {
+  Future setCameraExposure(double aperture, double shutterSpeed, double sensitivity) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -910,8 +834,7 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future setMaterialColor(FilamentEntity entity, String meshName,
-      int materialIndex, Color color) async {
+  Future setMaterialColor(FilamentEntity entity, String meshName, int materialIndex, Color color) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -938,8 +861,7 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future setPosition(
-      FilamentEntity entity, double x, double y, double z) async {
+  Future setPosition(FilamentEntity entity, double x, double y, double z) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -955,8 +877,7 @@ class FilamentControllerFFI extends FilamentController {
   }
 
   @override
-  Future setRotation(
-      FilamentEntity entity, double rads, double x, double y, double z) async {
+  Future setRotation(FilamentEntity entity, double rads, double x, double y, double z) async {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
@@ -968,9 +889,7 @@ class FilamentControllerFFI extends FilamentController {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    if (hide_mesh(
-            _assetManager!, entity, meshName.toNativeUtf8().cast<Char>()) !=
-        1) {}
+    if (hide_mesh(_assetManager!, entity, meshName.toNativeUtf8().cast<Char>()) != 1) {}
   }
 
   @override
@@ -978,9 +897,7 @@ class FilamentControllerFFI extends FilamentController {
     if (_viewer == null) {
       throw Exception("No viewer available, ignoring");
     }
-    if (reveal_mesh(
-            _assetManager!, entity, meshName.toNativeUtf8().cast<Char>()) !=
-        1) {
+    if (reveal_mesh(_assetManager!, entity, meshName.toNativeUtf8().cast<Char>()) != 1) {
       throw Exception("Failed to reveal mesh $meshName");
     }
   }
@@ -1080,8 +997,7 @@ class FilamentControllerFFI extends FilamentController {
     if (mode != ManipulatorMode.ORBIT) {
       throw Exception("Manipulator mode $mode not yet implemented");
     }
-    set_camera_manipulator_options(
-        _viewer!, mode.index, orbitSpeedX, orbitSpeedX, zoomSpeed);
+    set_camera_manipulator_options(_viewer!, mode.index, orbitSpeedX, orbitSpeedX, zoomSpeed);
   }
 
   @override

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_filament/filament_controller.dart';
 import 'package:flutter_filament/filament_controller_ffi.dart';
 
@@ -10,10 +9,7 @@ class ControllerMenu extends StatefulWidget {
   final void Function(FilamentController controller) onControllerCreated;
   final void Function() onControllerDestroyed;
 
-  ControllerMenu(
-      {this.controller,
-      required this.onControllerCreated,
-      required this.onControllerDestroyed});
+  const ControllerMenu({super.key, this.controller, required this.onControllerCreated, required this.onControllerDestroyed});
 
   @override
   State<StatefulWidget> createState() => _ControllerMenuState();
@@ -27,8 +23,7 @@ class _ControllerMenuState extends State<ControllerMenu> {
     if (_filamentController != null) {
       throw Exception("Controller already exists");
     }
-    _filamentController =
-        FilamentControllerFFI(uberArchivePath: uberArchivePath);
+    _filamentController = FilamentControllerFFI(uberArchivePath: uberArchivePath);
     widget.onControllerCreated(_filamentController!);
   }
 
@@ -68,8 +63,7 @@ class _ControllerMenuState extends State<ControllerMenu> {
           },
         ),
         MenuItemButton(
-          child: const Text(
-              "Create FilamentController (custom ubershader - lit opaque only)"),
+          child: const Text("Create FilamentController (custom ubershader - lit opaque only)"),
           onPressed: () {
             _createController(
                 uberArchivePath: Platform.isWindows
@@ -98,8 +92,7 @@ class _ControllerMenuState extends State<ControllerMenu> {
     return MenuAnchor(
         childFocusNode: _buttonFocusNode,
         menuChildren: items,
-        builder:
-            (BuildContext context, MenuController controller, Widget? child) {
+        builder: (BuildContext context, MenuController controller, Widget? child) {
           return Align(
               alignment: Alignment.bottomLeft,
               child: TextButton(
