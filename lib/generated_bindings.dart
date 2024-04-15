@@ -948,6 +948,41 @@ external void pick_ffi(
 @ffi.Native<ffi.Void Function()>(symbol: 'ios_dummy_ffi', assetId: 'flutter_filament_plugin')
 external void ios_dummy_ffi();
 
+///------------------------------------------------------------------------------------
+@ffi.Native<ffi.Int Function(ffi.Pointer<ffi.Void>, EntityId)>(
+    symbol: 'get_hierarchy_entity_count', assetId: 'flutter_filament_plugin')
+external int get_hierarchy_entity_count(
+  ffi.Pointer<ffi.Void> assetManager,
+  int asset,
+);
+
+@ffi.Native<ffi.Void Function(ffi.Pointer<ffi.Void>, EntityId, ffi.Pointer<ffi.Char>, ffi.Int)>(
+    symbol: 'get_hierarchy_entity_name', assetId: 'flutter_filament_plugin')
+external void get_hierarchy_entity_name(
+  ffi.Pointer<ffi.Void> assetManager,
+  int asset,
+  ffi.Pointer<ffi.Char> outPtr,
+  int index,
+);
+
+@ffi.Native<ffi.Int Function(ffi.Pointer<ffi.Void>, EntityId)>(
+    symbol: 'get_hierarchy_entity_count_ffi', assetId: 'flutter_filament_plugin')
+external int get_hierarchy_entity_count_ffi(
+  ffi.Pointer<ffi.Void> assetManager,
+  int asset,
+);
+
+@ffi.Native<ffi.Void Function(ffi.Pointer<ffi.Void>, EntityId, ffi.Pointer<ffi.Char>, ffi.Int)>(
+    symbol: 'get_hierarchy_entity_name_ffi', assetId: 'flutter_filament_plugin')
+external void get_hierarchy_entity_name_ffi(
+  ffi.Pointer<ffi.Void> assetManager,
+  int asset,
+  ffi.Pointer<ffi.Char> outPtr,
+  int index,
+);
+
+///------------------------------------------------------------------------------------
+
 final class __mbstate_t extends ffi.Union {
   @ffi.Array.multi([128])
   external ffi.Array<ffi.Char> __mbstate8;

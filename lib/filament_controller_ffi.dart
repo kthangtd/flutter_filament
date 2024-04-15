@@ -1034,4 +1034,20 @@ class FilamentControllerFFI extends FilamentController {
 
     return Frustum.matrix(projectionMatrix);
   }
+
+  @override
+  Future<List<String>> getHierarchies(FilamentEntity entity) async {
+    if (_viewer == null) {
+      throw Exception("No viewer available, ignoring");
+    }
+    var entityCount = get_hierarchy_entity_count(_assetManager!, entity);
+    var names = <String>[];
+    var outPtr = calloc<Char>(255);
+    for (int i = 0; i < entityCount; i++) {
+      get_hierarchy_entity_name_ffi(_assetManager!, entity, outPtr, i);
+      names.add(outPtr.cast<Utf8>().toDartString());
+    }
+
+    return names;
+  }
 }

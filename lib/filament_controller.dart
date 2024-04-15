@@ -22,8 +22,7 @@ class TextureDetails {
   final int width;
   final int height;
 
-  TextureDetails(
-      {required this.textureId, required this.width, required this.height});
+  TextureDetails({required this.textureId, required this.width, required this.height});
 }
 
 abstract class FilamentController {
@@ -183,17 +182,8 @@ abstract class FilamentController {
   ///       FOCUSED_SPOT,   //!< Physically correct spot light.
   ///       SPOT,           //!< Spot light with coupling of outer cone and illumination disabled.
   ///   };
-  Future<FilamentEntity> addLight(
-      int type,
-      double colour,
-      double intensity,
-      double posX,
-      double posY,
-      double posZ,
-      double dirX,
-      double dirY,
-      double dirZ,
-      bool castShadows);
+  Future<FilamentEntity> addLight(int type, double colour, double intensity, double posX, double posY, double posZ, double dirX,
+      double dirY, double dirZ, bool castShadows);
 
   Future removeLight(FilamentEntity light);
 
@@ -212,8 +202,7 @@ abstract class FilamentController {
   /// [relativeResourcePath] is the folder path where the glTF resources are stored;
   /// this is usually the parent directory of the .gltf file itself.
   ///
-  Future<FilamentEntity> loadGltf(String path, String relativeResourcePath,
-      {bool force = false});
+  Future<FilamentEntity> loadGltf(String path, String relativeResourcePath, {bool force = false});
 
   ///
   /// Called by `FilamentGestureDetector`. You probably don't want to call this yourself.
@@ -248,19 +237,16 @@ abstract class FilamentController {
   ///
   /// Set the weights for all morph targets under node [meshName] in [entity] to [weights].
   ///
-  Future setMorphTargetWeights(
-      FilamentEntity entity, String meshName, List<double> weights);
+  Future setMorphTargetWeights(FilamentEntity entity, String meshName, List<double> weights);
 
-  Future<List<String>> getMorphTargetNames(
-      FilamentEntity entity, String meshName);
+  Future<List<String>> getMorphTargetNames(FilamentEntity entity, String meshName);
 
   Future<List<String>> getAnimationNames(FilamentEntity entity);
 
   ///
   /// Returns the length (in seconds) of the animation at the given index.
   ///
-  Future<double> getAnimationDuration(
-      FilamentEntity entity, int animationIndex);
+  Future<double> getAnimationDuration(FilamentEntity entity, int animationIndex);
 
   ///
   /// Animate the morph targets in [entity]. See [MorphTargetAnimation] for an explanation as to how to construct the animation frame data.
@@ -268,8 +254,7 @@ abstract class FilamentController {
   /// throwing an exception if any cannot be found.
   /// It is permissible for [animation] to omit any targets that do exist under [meshName]; these simply won't be animated.
   ///
-  Future setMorphAnimationData(
-      FilamentEntity entity, MorphAnimationData animation);
+  Future setMorphAnimationData(FilamentEntity entity, MorphAnimationData animation);
 
   ///
   /// Animates morph target weights/bone transforms (where each frame requires a duration of [frameLengthInMs].
@@ -310,13 +295,9 @@ abstract class FilamentController {
   /// Schedules the glTF animation at [index] in [entity] to start playing on the next frame.
   ///
   Future playAnimation(FilamentEntity entity, int index,
-      {bool loop = false,
-      bool reverse = false,
-      bool replaceActive = true,
-      double crossfade = 0.0});
+      {bool loop = false, bool reverse = false, bool replaceActive = true, double crossfade = 0.0});
 
-  Future setAnimationFrame(
-      FilamentEntity entity, int index, int animationFrame);
+  Future setAnimationFrame(FilamentEntity entity, int index, int animationFrame);
   Future stopAnimation(FilamentEntity entity, int animationIndex);
 
   ///
@@ -397,8 +378,7 @@ abstract class FilamentController {
   ///
   /// Sets the camera exposure.
   ///
-  Future setCameraExposure(
-      double aperture, double shutterSpeed, double sensitivity);
+  Future setCameraExposure(double aperture, double shutterSpeed, double sensitivity);
 
   ///
   /// Rotate the camera by [rads] around the given axis. Note this is not persistent - any viewport navigation will reset the camera transform.
@@ -413,8 +393,7 @@ abstract class FilamentController {
   ///
   /// Sets the `baseColorFactor` property for the material at index [materialIndex] in [entity] under node [meshName] to [color].
   ///
-  Future setMaterialColor(
-      FilamentEntity entity, String meshName, int materialIndex, Color color);
+  Future setMaterialColor(FilamentEntity entity, String meshName, int materialIndex, Color color);
 
   ///
   /// Scale [entity] to fit within the unit cube.
@@ -439,8 +418,7 @@ abstract class FilamentController {
   ///
   /// Sets the rotation for [entity] to [rads] around the axis {x,y,z}.
   ///
-  Future setRotation(
-      FilamentEntity entity, double rads, double x, double y, double z);
+  Future setRotation(FilamentEntity entity, double rads, double x, double y, double z);
 
   ///
   /// Reveal the node [meshName] under [entity]. Only applicable if [hide] had previously been called; this is a no-op otherwise.
@@ -474,4 +452,6 @@ abstract class FilamentController {
       double orbitSpeedX = 0.01,
       double orbitSpeedY = 0.01,
       double zoomSpeed = 0.01});
+
+  Future<List<String>> getHierarchies(FilamentEntity entity);
 }

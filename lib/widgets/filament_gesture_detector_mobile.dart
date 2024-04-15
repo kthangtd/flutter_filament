@@ -136,6 +136,18 @@ class _FilamentGestureDetectorMobileState extends State<FilamentGestureDetectorM
           onPointerCancel: (e) {
             widget.controller.rotateEnd();
           },
+
+          onPointerPanZoomStart: (e) {
+            widget.controller.zoomBegin();
+          },
+          onPointerPanZoomUpdate: (e) {
+            widget.controller.zoomUpdate(e.localPanDelta.dx, e.localPanDelta.dy, 1);
+          },
+
+          onPointerPanZoomEnd: (e) {
+            widget.controller.zoomEnd();
+          },
+
           // onDoubleTap: () {
           //   // setState(() {
           //   //   _rotateOnPointerMove = !_rotateOnPointerMove;
